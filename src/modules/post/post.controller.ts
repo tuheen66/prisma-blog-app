@@ -5,7 +5,7 @@ const createPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
     if (!user) {
-     return res.status(400).json({
+      return res.status(400).json({
         error: "Unauthorized",
       });
     }
@@ -21,7 +21,14 @@ const createPost = async (req: Request, res: Response) => {
 
 const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const result = await postServices.getAllPosts();
+    const { search } = req.query;
+
+    const searchString = typeof search === "string" ? search : undefined;
+
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+    const result = await postServices.getAllPosts({ search: searchString, tags });
+    
     res.status(200).json(result);
   } catch (error) {
     res.status(400).json({
